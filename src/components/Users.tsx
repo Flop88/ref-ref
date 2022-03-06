@@ -21,6 +21,7 @@ export default function Users() {
     if(error) return <p>[error.message]</p>
     return(
         <div>
+            <p>Test</p>
             {
                 data.users.map((user: User) => (
                     <p>{user.name}</p>
