@@ -16,6 +16,8 @@ interface User {
 
 export default function Users() {
     const {loading, error, data} = useQuery(USERS_QUERY)
+    console.log("data:" + data)
+    console.log("data:" + JSON.stringify(data))
 
     if(loading) return <p>Loading...</p>
     if(error) return <p>[error.message]</p>
