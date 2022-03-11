@@ -4,7 +4,7 @@ import {ApolloClient, ApolloProvider, HttpLink, InMemoryCache} from '@apollo/cli
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import {setContext} from 'apollo-link-context'
 import Users from './components/Users'
-import Landing from './components/Landing';
+import Main from './components/Main';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import IsAuthentificated from './components/isAuthentificated';
@@ -33,7 +33,7 @@ function App() {
     <ApolloProvider client={client} >
         <Router>
           <Routes>        
-            <Route path="/landing" element={<Landing />}/>
+            <Route path="/main" element={<Main />}/>
             <Route path="/signup" element={<Signup />}/>
             <Route path="/login" element={<Login />}/>
             

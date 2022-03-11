@@ -2,7 +2,8 @@ import React from 'react';
 import {gql, useMutation} from '@apollo/client'
 import {ErrorMessage, Field, Form, Formik} from 'formik'
 import * as Yup from 'yup'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import RefLogo  from '../styles/assets/rr-logo.png'
 
 const LOGIN_MATATION = gql`
 mutation login($email: String!, $password: String!) {
@@ -28,16 +29,20 @@ interface LoginValues {
 
     const validationSchema = Yup.object({
         email: Yup.string()
-            .email("Invalid email address")
-            .required("Email required"),
+            .email("Не корректный email.")
+            .required("Email не должен быть пустым."),
         password: Yup.string()
-            .max(20,"Must be 20 characters or less")
-            .required("Password required")
+            .max(20,"Должно быть не более 20 символов.")
+            .required("Пароль не должен быть пустым.")
     })
 
     return(
-        <div>
-            <h1>Login</h1>
+        <div className="container">
+            <Link to="/main">
+                <img src={RefLogo} alt="logo" style={{ width: "100px" }} className="logo" />
+            </Link>
+			
+            <h3>Регистрация в Ref Ref</h3>
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -54,11 +59,15 @@ interface LoginValues {
                     <Form>
                         <Field name="email" type="text" placeholder="Email" /> 
                         <ErrorMessage name="email" component={'div'} />
-                        <Field name="password" type="password" placeholder="Password" /> 
+                        <Field name="password" type="password" placeholder="Пароль" /> 
                         <ErrorMessage name="password" component={'div'} />
-                        <button type="submit">Log in</button>
+                        <button type="submit" className="login-btn"><span>Войти</span></button>
                     </Form>    
                 </Formik> 
+                <div className="register">
+                    <h4>Нет аккаунта?</h4>
+                    <Link to="/signup">Зарегистрироваться</Link>
+                </div>
         </div>
     )
 } 

@@ -2,7 +2,8 @@ import React from 'react';
 import {gql, useMutation} from '@apollo/client'
 import {ErrorMessage, Field, Form, Formik} from 'formik'
 import * as Yup from 'yup'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import RefLogo  from '../styles/assets/rr-logo.png'
 
 const SIGNUP_MATATION = gql`
 mutation signup($name: String, $email: String!, $password: String!) {
@@ -46,8 +47,11 @@ interface SignupValues {
     })
 
     return(
-        <div>
-            <h1>Signup</h1>
+        <div className="container">
+			<Link to="/main">
+                <img src={RefLogo} alt="logo" style={{ width: "100px" }} className="logo" />
+            </Link>
+            <h3>Регистрация в Ref Ref</h3>
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -64,15 +68,19 @@ interface SignupValues {
                     <Form>
                         <Field name="email" type="text" placeholder="Email" /> 
                         <ErrorMessage name="email" component={'div'} />
-                        <Field name="name" type="text" placeholder="Name" /> 
+                        <Field name="name" type="text" placeholder="Имя пользователя" /> 
                         <ErrorMessage name="name" component={'div'} />
-                        <Field name="password" type="password" placeholder="Password" /> 
+                        <Field name="password" type="password" placeholder="Пароль" /> 
                         <ErrorMessage name="password" component={'div'} />
-                        <Field name="confirmPassword" type="password" placeholder="Confirm Password" /> 
+                        <Field name="confirmPassword" type="password" placeholder="Подтверждение пароля" /> 
                         <ErrorMessage name="confirmPassword" component={'div'} />
-                        <button type="submit">Signup</button>
+                        <button type="submit" className="login-btn"><span>Регистрация</span></button>
                     </Form>    
                 </Formik> 
+                <div className="register">
+                    <h4>Уже зарегистрированы?</h4>
+                    <Link to="/login">Войти</Link>
+                </div>
         </div>
     )
 } 

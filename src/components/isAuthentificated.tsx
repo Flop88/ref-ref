@@ -25,7 +25,7 @@ function IsAuthenticated({ children }: Props) {
       return <p>{error.message}</p>
 
   if (!data.me) {
-      return <Navigate to={{ pathname: "/landing" }} />
+      return <Navigate to={{ pathname: "/main" }} />
   }
 
   return <>{children}</>
