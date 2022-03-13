@@ -1,50 +1,53 @@
-import React from 'react';
-import {gql, useMutation} from '@apollo/client'
+import { useState } from 'react';
 import {ErrorMessage, Field, Form, Formik} from 'formik'
 import * as Yup from 'yup'
 import { useNavigate, Link } from 'react-router-dom'
 import RefLogo  from '../styles/assets/rr-logo.png'
+import axios from 'axios';
 
-const SIGNUP_MATATION = gql`
-mutation signup($name: String, $email: String!, $password: String!) {
-    signup(name: $name, email: $email, password: $password) {
-        token
-    }
-}
-`
 
 interface SignupValues {
-    email: string,
+    username: string,
     password: string,
-    confirmPassword: string,
-    name: string
+    confirmPassword: string
 }
-
  function Signup() {
     const navigate = useNavigate()
-    const [signup, {data}]= useMutation(SIGNUP_MATATION)
 
     const initialValues: SignupValues = {
-        email: '',
+        username: '',
         password: '',
-        confirmPassword: '',
-        name: ''
+        confirmPassword: ''
     }
+    const [form, setForm] = useState({
+            username: '',
+            password: ''
+        
+    })
 
     const validationSchema = Yup.object({
-        email: Yup.string()
-            .email("Invalid email address")
-            .required("Email required"),
+        username: Yup.string()
+            .required("Username required"),
         password: Yup.string()
             .max(20,"Must be 20 characters or less")
             .required("Password required"),
         confirmPassword: Yup.string().oneOf(
             [Yup.ref("password")],
             "Password must match"),
-        name: Yup.string()
-            .max(15,"Name be 15 characters or less")
-            .required("Name required"),
     })
+
+    const registerHandler = async () => {
+        try {
+            await axios.post('/api/auth/registration', { ...form }, {
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then(response => {
+                    console.log(response)
+                })
+        } catch (error) {
+            console.log("Ошибка: " + error)
+        }
+    }
 
     return(
         <div className="container">
@@ -57,19 +60,28 @@ interface SignupValues {
                 validationSchema={validationSchema}
                 onSubmit={async(values, {setSubmitting}) => {
                     setSubmitting(true)
-                    const response = await signup({
-                        variables: values
-                    })
-                    localStorage.setItem("token", response.data.signup.token)
+
+                    const response = values
+                    const username = response.username
+                    const password = response.password
+
+                    setForm({ ...form, username: username, password: password})
+
+                    if({...form}.username != "" && {...form}.password != "") {
+                        registerHandler()
+                        setSubmitting(false)
+                        navigate('/users')
+                    } else {
+                        console.log("ERROR")
+                    }
+                    
+                    // localStorage.setItem("token", response.data.signup.token)
                     setSubmitting(false)
-                    navigate('/users')
                 }}
                 >
                     <Form>
-                        <Field name="email" type="text" placeholder="Email" /> 
-                        <ErrorMessage name="email" component={'div'} />
-                        <Field name="name" type="text" placeholder="Имя пользователя" /> 
-                        <ErrorMessage name="name" component={'div'} />
+                        <Field name="username" type="text" placeholder="Имя пользователя" /> 
+                        <ErrorMessage name="username" component={'div'} />
                         <Field name="password" type="password" placeholder="Пароль" /> 
                         <ErrorMessage name="password" component={'div'} />
                         <Field name="confirmPassword" type="password" placeholder="Подтверждение пароля" /> 

@@ -1,36 +1,53 @@
-import React from 'react';
-import {gql, useMutation} from '@apollo/client'
+import {useState, useCallback} from 'react';
 import {ErrorMessage, Field, Form, Formik} from 'formik'
 import * as Yup from 'yup'
 import { useNavigate, Link } from 'react-router-dom'
 import RefLogo  from '../styles/assets/rr-logo.png'
-
-const LOGIN_MATATION = gql`
-mutation login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-        token
-    }
-}
-`
+import axios from 'axios';
 
 interface LoginValues {
-    email: string,
+    username: string,
     password: string
 }
 
  function Login() {
+    const [form, setForm] = useState({
+        username: '',
+        password: ''
+    
+})
+    const loginHandler = useCallback(async () => {
+        try {
+            await axios.post('/api/auth/login', { ...form }, {
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then(response => {
+                    console.log(response.data.success)
+                    const success = response.data.success
+                    if (success) {
+                        const token = response.data.data
+                        localStorage.setItem("token", token)
+
+                        navigate('/users')
+                    } else {
+                        console.log(response.data)
+                    }
+                    
+                })
+        } catch (error) {
+            console.log("Ошибка: " + error)
+        }
+    }, [form])
     const navigate = useNavigate()
-    const [login, {data}]= useMutation(LOGIN_MATATION)
 
     const initialValues: LoginValues = {
-        email: '',
+        username: '',
         password: ''
     }
 
     const validationSchema = Yup.object({
-        email: Yup.string()
-            .email("Не корректный email.")
-            .required("Email не должен быть пустым."),
+        username: Yup.string()
+            .required("Логин не должен быть пустым."),
         password: Yup.string()
             .max(20,"Должно быть не более 20 символов.")
             .required("Пароль не должен быть пустым.")
@@ -47,18 +64,34 @@ interface LoginValues {
                 initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={async(values, {setSubmitting}) => {
+                    // setSubmitting(true)
+                    // const response = await login({
+                    //     variables: values
+                    // })
+                    // localStorage.setItem("token", response.data.login.token)
+                    // setSubmitting(false)
+                    // navigate('/users')
                     setSubmitting(true)
-                    const response = await login({
-                        variables: values
-                    })
-                    localStorage.setItem("token", response.data.login.token)
-                    setSubmitting(false)
-                    navigate('/users')
+
+                    const response = values
+                    const username = response.username
+                    const password = response.password
+
+                    console.log(username, password)
+
+                    setForm({ ...form, username: username, password: password})
+                    if({...form}.username != "" && {...form}.password != "") {
+                        console.log("REGISTER")
+                        loginHandler()
+                        setSubmitting(false)
+                    } else {
+                        console.log("ERROR")
+                    }
                 }}
                 >
                     <Form>
-                        <Field name="email" type="text" placeholder="Email" /> 
-                        <ErrorMessage name="email" component={'div'} />
+                        <Field name="username" type="text" placeholder="Имя пользователя" /> 
+                        <ErrorMessage name="username" component={'div'} />
                         <Field name="password" type="password" placeholder="Пароль" /> 
                         <ErrorMessage name="password" component={'div'} />
                         <button type="submit" className="login-btn"><span>Войти</span></button>
